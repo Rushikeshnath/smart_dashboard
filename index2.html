@@ -1,0 +1,3017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Base Styles */
+:root {
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --accent: #4895ef;
+    --dark: #212529;
+    --light: #f8f9fa;
+    --success: #4cc9f0;
+    --danger: #f72585;
+    --warning: #f8961e;
+    --info: #90e0ef;
+    --folder: #f8961e;
+    --note: #ffd166;
+    --task: #06d6a0;
+    --server: #118ab2;
+    --contact: #ef476f;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #121212 0%, #2a2a2a 100%);
+    color: var(--light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+header {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 600;
+    background: linear-gradient(to right, var(--success), var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 300px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 2px var(--accent);
+}
+
+.date-time {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Main Content Styles */
+main {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.dashboard-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.section-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.section-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.section-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* App Grid Styles */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px;
+}
+
+.app-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    height: 120px;
+}
+
+.app-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+.app-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.app-card:hover::before {
+    opacity: 0.2;
+}
+
+.app-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.app-card:hover .app-icon {
+    transform: scale(1.2);
+}
+
+.app-name {
+    font-size: 14px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.delete-app {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.edit-app {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.app-card:hover .delete-app,
+.app-card:hover .edit-app {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.folder-app .app-icon {
+    color: var(--folder);
+}
+
+.app-type-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: rgba(255, 255, 255, 0.7);
+}
+/* Notes Styles */
+.notes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.note-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 15px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border-top: 3px solid var(--note);
+}
+
+.note-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.note-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.note-content {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.note-date {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.note-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.note-card:hover .note-actions {
+    opacity: 1;
+}
+
+.note-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.note-btn:hover {
+    transform: scale(1.1);
+}
+
+.note-btn.edit {
+    background: var(--primary);
+}
+
+.note-btn.delete {
+    background: var(--danger);
+}
+
+.add-note-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 100%;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 10px;
+}
+
+.add-note-btn:hover {
+    border-color: var(--note);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Tasks Styles */
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    position: relative;
+    border-left: 3px solid var(--task);
+}
+
+.task-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(5px);
+}
+
+.task-checkbox {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    margin-right: 15px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.task-checkbox:checked {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.task-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 12px;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-text {
+    font-size: 14px;
+    color: white;
+    margin-bottom: 5px;
+    transition: all 0.2s ease;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.task-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.task-date, .task-priority {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.priority-badge {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.priority-high {
+    background: var(--danger);
+}
+
+.priority-medium {
+    background: var(--warning);
+}
+
+.priority-low {
+    background: var(--info);
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.task-item:hover .task-actions {
+    opacity: 1;
+}
+/* Servers Styles */
+.servers-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.servers-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--light);
+}
+
+.servers-table th {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.servers-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.servers-table tr {
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.servers-table tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.server-status {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-online {
+    background: var(--success);
+}
+
+.status-offline {
+    background: var(--danger);
+}
+
+.status-maintenance {
+    background: var(--warning);
+}
+
+.server-type {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Server Styles (Continued) */
+.type-web {
+    color: var(--info);
+    border: 1px solid var(--info);
+}
+
+.type-db {
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.type-file {
+    color: var(--folder);
+    border: 1px solid var(--folder);
+}
+
+.type-auth {
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.server-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.server-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.server-btn:hover {
+    transform: scale(1.1);
+}
+
+.server-btn.connect {
+    background: var(--primary);
+}
+
+.server-btn.edit {
+    background: var(--warning);
+}
+
+.server-btn.delete {
+    background: var(--danger);
+}
+
+/* Contacts Styles */
+.contacts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.contact-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.25s ease;
+    border-top: 3px solid var(--contact);
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.contact-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.contact-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--contact);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    margin-right: 15px;
+}
+
+.contact-info {
+    flex: 1;
+}
+
+.contact-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.contact-title {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.contact-item i {
+    margin-right: 10px;
+    width: 15px;
+    text-align: center;
+    color: var(--contact);
+}
+
+.contact-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.contact-card:hover .contact-actions {
+    opacity: 1;
+}
+
+.contact-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.contact-btn:hover {
+    transform: scale(1.1);
+}
+
+.contact-btn.edit {
+    background: var(--primary);
+}
+
+.contact-btn.delete {
+    background: var(--danger);
+}
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #2a2a2a;
+    border-radius: 10px;
+    padding: 30px;
+    width: 600px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    animation: modalAppear 0.3s ease;
+}
+
+@keyframes modalAppear {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(72, 149, 239, 0.3);
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.icon-selector {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.icon-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.icon-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-option.selected {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #d61a6f;
+    transform: translateY(-2px);
+}
+
+/* Form Layout */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.pill-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.pill-option {
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.pill-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pill-option.selected {
+    background: var(--primary);
+    color: white;
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--success);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-content {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toast.error {
+    background: var(--danger);
+}
+
+/* Utility Styles */
+.folder-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.folder-input-group .form-control {
+    flex: 1;
+}
+
+.folder-input-group .btn {
+    padding: 12px 15px;
+}
+
+.form-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 5px;
+}
+
+#addSectionBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+}
+
+#addSectionBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#addSectionBtn .section-title {
+    color: var(--accent);
+}
+
+/* Section title colors */
+.section-title[data-type="note"] {
+    color: var(--note);
+}
+
+.section-title[data-type="task"] {
+    color: var(--task);
+}
+
+.section-title[data-type="server"] {
+    color: var(--server);
+}
+
+.section-title[data-type="contact"] {
+    color: var(--contact);
+}
+/* Section toggle button */
+.section-toggle-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px;
+    margin-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.section-toggle-btn:hover {
+    color: white;
+}
+
+.section-toggle-btn i {
+    transition: transform 0.3s ease;
+}
+
+.section-toggle-btn.collapsed i {
+    transform: rotate(180deg);
+}
+
+/* For collapsed sections */
+.dashboard-section.collapsed .app-grid,
+.dashboard-section.collapsed .notes-container,
+.dashboard-section.collapsed .tasks-container,
+.dashboard-section.collapsed .servers-container,
+.dashboard-section.collapsed .contacts-container {
+    display: none;
+}
+
+.dashboard-section.collapsed {
+    padding-bottom: 15px;
+}
+
+/* Store section state */
+.section-header {
+    position: relative;
+}
+
+.section-toggle-btn {
+    position: absolute;
+    left: 130px; /* Adjust this value to position the button correctly */
+    top: 50%;
+    transform: translateY(-50%);
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Smart Dashboard</h1>
+        <div class="search-bar">
+            <input type="text" placeholder="Search..." id="searchInput">
+        </div>
+        <div class="date-time" id="dateTime"></div>
+    </header>
+
+    <main>
+        <!-- Applications Section -->
+        <div class="dashboard-section" id="appsSection">
+            <div class="section-header">
+                <div class="section-title">Applications</div>
+                <button class="section-toggle-btn" title="Toggle section visibility">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <div class="section-actions">
+                    <button class="section-btn" id="addAppBtn">Add App</button>
+                    <button class="section-btn" id="addFolderBtn">Add Folder</button>
+                </div>
+            </div>
+            <div class="app-grid" id="appsGrid">
+                <!-- Apps will be added dynamically by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="dashboard-section" id="notesSection">
+            <div class="section-header">
+                <div class="section-title" data-type="note">Notes</div>
+                <!-- In each section header, add this code next to the section title -->
+                <button class="section-toggle-btn" title="Toggle section visibility">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <div class="section-actions">
+                    <button class="section-btn" id="addNoteBtn">Add Note</button>
+                </div>
+            </div>
+            <div class="notes-container" id="notesContainer">
+                <!-- Notes will be added dynamically by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="dashboard-section" id="tasksSection">
+            <div class="section-header">
+                <div class="section-title" data-type="task">Tasks</div>
+                <button class="section-toggle-btn" title="Toggle section visibility">
+                    <i class="fas fa-chevron-up"></i>
+                </button>                
+                <div class="section-actions">
+                    <button class="section-btn" id="addTaskBtn">Add Task</button>
+                </div>
+            </div>
+            <div class="tasks-container" id="tasksContainer">
+                <!-- Tasks will be added dynamically by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Servers Section -->
+        <div class="dashboard-section" id="serversSection">
+            <div class="section-header">
+                <div class="section-title" data-type="server">Servers</div>
+                <button class="section-toggle-btn" title="Toggle section visibility">
+                    <i class="fas fa-chevron-up"></i>
+                </button>                
+                <div class="section-actions">
+                    <button class="section-btn" id="addServerBtn">Add Server</button>
+                </div>
+            </div>
+            <div class="servers-container">
+                <button class="section-toggle-btn" title="Toggle section visibility">
+                    <i class="fas fa-chevron-up"></i>
+                </button>                
+                <table class="servers-table" id="serversTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>IP Address</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="serversTableBody">
+                        <!-- Server entries will be added dynamically by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Contacts Section -->
+        <div class="dashboard-section" id="contactsSection">
+            <div class="section-header">
+                <div class="section-title" data-type="contact">Contacts</div>
+                <button class="section-toggle-btn" title="Toggle section visibility">
+                    <i class="fas fa-chevron-up"></i>
+                </button>                
+                <div class="section-actions">
+                    <button class="section-btn" id="addContactBtn">Add Contact</button>
+                </div>
+            </div>
+            <div class="contacts-container" id="contactsContainer">
+                <!-- Contacts will be added dynamically by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Custom sections will be added dynamically below -->
+        <div id="customSections">
+            <button class="section-toggle-btn" title="Toggle section visibility">
+                <i class="fas fa-chevron-up"></i>
+            </button>            
+            <!-- Custom sections will go here -->
+        </div>
+        
+        <!-- Add section button -->
+        <div class="dashboard-section" id="addSectionBtn">
+            <div class="section-title">+ Add New Section</div>           
+        </div>
+    </main>
+	<!-- App Modal -->
+    <div class="modal" id="appModal">
+        <div class="modal-content">
+            <div class="modal-title" id="appModalTitle">Add New Application</div>
+            <form id="appForm">
+                <input type="hidden" id="editAppIndex" value="-1">
+                <input type="hidden" id="appType" value="url">
+                <input type="hidden" id="editAppSection" value="">
+                <div class="form-group">
+                    <label for="appName">Application Name</label>
+                    <input type="text" class="form-control" id="appName" placeholder="e.g. Notion" required>
+                </div>
+                
+                <div class="form-group" id="appUrlGroup">
+                    <label for="appUrl">URL</label>
+                    <input type="text" class="form-control" id="appUrl" placeholder="https://...">
+                </div>
+                
+                <div class="form-group" id="appFolderGroup" style="display: none;">
+                    <label for="appFolder">Folder Path</label>
+                    <div class="folder-input-group">
+                        <input type="text" class="form-control" id="appFolder" placeholder="C:\Path\To\Folder">
+                        <button type="button" class="btn btn-secondary" id="selectFolderBtn">Browse</button>
+                    </div>
+                    <small class="form-text">Note: Enter the folder path manually (e.g., C:\Users\YourName\Documents)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Icon</label>
+                    <div class="icon-selector" id="iconSelector">
+                        <!-- Icons will be added dynamically by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAppBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveAppBtn">Add Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Section Modal -->
+    <div class="modal" id="sectionModal">
+        <div class="modal-content">
+            <div class="modal-title" id="sectionModalTitle">Add New Section</div>
+            <form id="sectionForm">
+                <input type="hidden" id="editSectionIndex" value="-1">
+                
+                <div class="form-group">
+                    <label for="sectionName">Section Name</label>
+                    <input type="text" class="form-control" id="sectionName" placeholder="e.g. Development Tools" required>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelSectionBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveSectionBtn">Add Section</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-title" id="noteModalTitle">Add New Note</div>
+            <form id="noteForm">
+                <input type="hidden" id="editNoteIndex" value="-1">
+                
+                <div class="form-group">
+                    <label for="noteTitle">Title</label>
+                    <input type="text" class="form-control" id="noteTitle" placeholder="Note title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="noteContent">Content</label>
+                    <textarea class="form-control" id="noteContent" placeholder="Write your note here..." required></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelNoteBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveNoteBtn">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-title" id="taskModalTitle">Add New Task</div>
+            <form id="taskForm">
+                <input type="hidden" id="editTaskIndex" value="-1">
+                
+                <div class="form-group">
+                    <label for="taskText">Task</label>
+                    <input type="text" class="form-control" id="taskText" placeholder="What needs to be done?" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="taskDueDate">Due Date</label>
+                            <input type="date" class="form-control" id="taskDueDate">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <div class="pill-selector" id="taskPrioritySelector">
+                                <div class="pill-option" data-value="low">Low</div>
+                                <div class="pill-option selected" data-value="medium">Medium</div>
+                                <div class="pill-option" data-value="high">High</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskNotes">Notes (Optional)</label>
+                    <textarea class="form-control" id="taskNotes" placeholder="Additional details..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelTaskBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveTaskBtn">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Server Modal -->
+    <div class="modal" id="serverModal">
+        <div class="modal-content">
+            <div class="modal-title" id="serverModalTitle">Add New Server</div>
+            <form id="serverForm">
+                <input type="hidden" id="editServerIndex" value="-1">
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="serverName">Server Name</label>
+                            <input type="text" class="form-control" id="serverName" placeholder="e.g. Web Server" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="serverIP">IP Address</label>
+                            <input type="text" class="form-control" id="serverIP" placeholder="192.168.1.1" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <div class="pill-selector" id="serverTypeSelector">
+                                <div class="pill-option selected" data-value="web">Web Server</div>
+                                <div class="pill-option" data-value="db">Database</div>
+                                <div class="pill-option" data-value="file">File Server</div>
+                                <div class="pill-option" data-value="auth">Auth Server</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <div class="pill-selector" id="serverStatusSelector">
+                                <div class="pill-option selected" data-value="online">Online</div>
+                                <div class="pill-option" data-value="offline">Offline</div>
+                                <div class="pill-option" data-value="maintenance">Maintenance</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="serverNotes">Notes (Optional)</label>
+                    <textarea class="form-control" id="serverNotes" placeholder="Additional information about this server..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelServerBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveServerBtn">Save Server</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <div class="modal-title" id="contactModalTitle">Add New Contact</div>
+            <form id="contactForm">
+                <input type="hidden" id="editContactIndex" value="-1">
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="contactName">Name</label>
+                            <input type="text" class="form-control" id="contactName" placeholder="Full Name" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="contactTitle">Job Title</label>
+                            <input type="text" class="form-control" id="contactTitle" placeholder="e.g. Software Developer">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">Email</label>
+                    <input type="email" class="form-control" id="contactEmail" placeholder="email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPhone">Phone</label>
+                    <input type="text" class="form-control" id="contactPhone" placeholder="+1 (555) 123-4567">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactCompany">Company</label>
+                    <input type="text" class="form-control" id="contactCompany" placeholder="Company Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactNotes">Notes (Optional)</label>
+                    <textarea class="form-control" id="contactNotes" placeholder="Additional information..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelContactBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveContactBtn">Save Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content" id="toastContent"></div>
+    </div>
+</body>
+</html>
+<script>
+// Main data structures to store dashboard items
+let apps = [];
+let notes = [];
+let tasks = [];
+let servers = [];
+let contacts = [];
+let customSections = [];
+
+// Icons for applications and folders
+const availableIcons = [
+    '📝', '📊', '📈', '📅', '🔔', '🔍', 
+    '💬', '📧', '📁', '🔐', '⚙️', '🎮', 
+    '🎵', '📚', '🎓', '💡', '🔗', '🌐', 
+    '📱', '💻', '🖥️', '🎨', '🛒', '🏠',
+    '📂', '🗃️', '🗄️', '📋', '📌', '📎'
+];
+
+// Initialize the dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDashboard();
+});
+
+// Initialize the dashboard
+function initializeDashboard() {
+    loadDataFromStorage();
+    updateDateTime();
+    setupEventListeners();
+    renderAllSections();
+}
+
+// Load data from localStorage
+function loadDataFromStorage() {
+    apps = JSON.parse(localStorage.getItem('dashboard_apps')) || getDefaultApps();
+    notes = JSON.parse(localStorage.getItem('dashboard_notes')) || [];
+    tasks = JSON.parse(localStorage.getItem('dashboard_tasks')) || [];
+    servers = JSON.parse(localStorage.getItem('dashboard_servers')) || [];
+    contacts = JSON.parse(localStorage.getItem('dashboard_contacts')) || [];
+    customSections = JSON.parse(localStorage.getItem('dashboard_sections')) || [];
+}
+
+// Get default apps
+function getDefaultApps() {
+    return [
+        { id: 'app1', name: 'Google', icon: '🔍', url: 'https://google.com', type: 'url' },
+        { id: 'app2', name: 'Gmail', icon: '📧', url: 'https://mail.google.com', type: 'url' },
+        { id: 'app3', name: 'YouTube', icon: '▶️', url: 'https://youtube.com', type: 'url' },
+        { id: 'app4', name: 'Outlook', icon: '✉️', url: 'https://outlook.live.com', type: 'url' },
+        { id: 'app5', name: 'GitHub', icon: '💻', url: 'https://github.com', type: 'url' }
+    ];
+}
+
+// Update date and time
+function updateDateTime() {
+    const now = new Date();
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    document.getElementById('dateTime').textContent = now.toLocaleDateString('en-US', options);
+    
+    // Update every minute
+    setTimeout(updateDateTime, 60000);
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Add app button
+    document.getElementById('addAppBtn').addEventListener('click', function() {
+        showAppModal('url');
+    });
+    // Add to your setupEventListeners function
+function setupSectionToggles() {
+    // Add toggle functionality to all sections
+    document.querySelectorAll('.section-toggle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const section = this.closest('.dashboard-section');
+            section.classList.toggle('collapsed');
+            this.classList.toggle('collapsed');
+            
+            // Save state to localStorage
+            const sectionId = section.id;
+            const isCollapsed = section.classList.contains('collapsed');
+            const collapsedSections = JSON.parse(localStorage.getItem('dashboard_collapsed_sections')) || {};
+            collapsedSections[sectionId] = isCollapsed;
+            localStorage.setItem('dashboard_collapsed_sections', JSON.stringify(collapsedSections));
+        });
+    });
+    
+    // Load saved collapse states
+    const collapsedSections = JSON.parse(localStorage.getItem('dashboard_collapsed_sections')) || {};
+    Object.entries(collapsedSections).forEach(([sectionId, isCollapsed]) => {
+        if (isCollapsed) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('collapsed');
+                const button = section.querySelector('.section-toggle-btn');
+                if (button) button.classList.add('collapsed');
+            }
+        }
+    });
+}
+
+// Call this function after your sections are rendered
+setupSectionToggles();
+    // Add folder button
+    document.getElementById('addFolderBtn').addEventListener('click', function() {
+        showAppModal('folder');
+    });
+    
+    // Add note button
+    document.getElementById('addNoteBtn').addEventListener('click', function() {
+        showNoteModal();
+    });
+    
+    // Add task button
+    document.getElementById('addTaskBtn').addEventListener('click', function() {
+        showTaskModal();
+    });
+    
+    // Add server button
+    document.getElementById('addServerBtn').addEventListener('click', function() {
+        showServerModal();
+    });
+    
+    // Add contact button
+    document.getElementById('addContactBtn').addEventListener('click', function() {
+        showContactModal();
+    });
+    
+    // Add section button
+    document.getElementById('addSectionBtn').addEventListener('click', function() {
+        showSectionModal();
+    });
+    
+    // Search input
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        handleSearch(searchTerm);
+    });
+    
+    // Modal forms
+    document.getElementById('appForm').addEventListener('submit', saveApp);
+    document.getElementById('noteForm').addEventListener('submit', saveNote);
+    document.getElementById('taskForm').addEventListener('submit', saveTask);
+    document.getElementById('serverForm').addEventListener('submit', saveServer);
+    document.getElementById('contactForm').addEventListener('submit', saveContact);
+    document.getElementById('sectionForm').addEventListener('submit', saveSection);
+    
+    // Cancel buttons
+    document.getElementById('cancelAppBtn').addEventListener('click', hideAppModal);
+    document.getElementById('cancelNoteBtn').addEventListener('click', hideNoteModal);
+    document.getElementById('cancelTaskBtn').addEventListener('click', hideTaskModal);
+    document.getElementById('cancelServerBtn').addEventListener('click', hideServerModal);
+    document.getElementById('cancelContactBtn').addEventListener('click', hideContactModal);
+    document.getElementById('cancelSectionBtn').addEventListener('click', hideSectionModal);
+    
+    // Task priority selector
+    const priorityOptions = document.querySelectorAll('#taskPrioritySelector .pill-option');
+    priorityOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            priorityOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+    
+    // Server type selector
+    const typeOptions = document.querySelectorAll('#serverTypeSelector .pill-option');
+    typeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            typeOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+    
+    // Server status selector
+    const statusOptions = document.querySelectorAll('#serverStatusSelector .pill-option');
+    statusOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            statusOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+}
+// Render all sections
+function renderAllSections() {
+    renderApps();
+    renderNotes();
+    renderTasks();
+    renderServers();
+    renderContacts();
+    renderCustomSections();
+}
+
+// Generate unique ID
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+// Render apps
+function renderApps() {
+    const grid = document.getElementById('appsGrid');
+    grid.innerHTML = '';
+    
+    apps.forEach(app => {
+        const appCard = createAppCard(app);
+        grid.appendChild(appCard);
+    });
+}
+
+// Create app card
+function createAppCard(app) {
+    const appCard = document.createElement('div');
+    appCard.className = 'app-card';
+    if (app.type === 'folder') appCard.classList.add('folder-app');
+    
+    appCard.innerHTML = `
+        <div class="app-icon">${app.icon}</div>
+        <div class="app-name">${app.name}</div>
+        ${app.type === 'folder' ? '<div class="app-type-badge">Folder</div>' : ''}
+    `;
+    
+    // Edit button
+    const editBtn = document.createElement('div');
+    editBtn.className = 'edit-app';
+    editBtn.innerHTML = '✏️';
+    editBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        editApp(app.id);
+    });
+    appCard.appendChild(editBtn);
+    
+    // Delete button
+    const deleteBtn = document.createElement('div');
+    deleteBtn.className = 'delete-app';
+    deleteBtn.innerHTML = '×';
+    deleteBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        deleteApp(app.id);
+    });
+    appCard.appendChild(deleteBtn);
+    
+    // Open app or folder on click
+    appCard.addEventListener('click', function() {
+        if (app.type === 'folder') {
+            // For local folder
+            openLocalFolder(app.path);
+        } else {
+            // For web URL
+            window.open(app.url, '_blank');
+        }
+        showToast(`Opening ${app.name}...`);
+    });
+    
+    return appCard;
+}
+
+// Render notes
+function renderNotes() {
+    const container = document.getElementById('notesContainer');
+    container.innerHTML = '';
+    
+    if (notes.length === 0) {
+        const emptyNote = document.createElement('div');
+        emptyNote.className = 'add-note-btn';
+        emptyNote.innerHTML = `
+            <i class="fas fa-sticky-note"></i>
+            <span>Add your first note</span>
+        `;
+        emptyNote.addEventListener('click', showNoteModal);
+        container.appendChild(emptyNote);
+        return;
+    }
+    
+    notes.forEach(note => {
+        const noteCard = createNoteCard(note);
+        container.appendChild(noteCard);
+    });
+}
+
+// Create note card
+function createNoteCard(note) {
+    const noteCard = document.createElement('div');
+    noteCard.className = 'note-card';
+    
+    // Format date
+    const date = new Date(note.date);
+    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    noteCard.innerHTML = `
+        <div class="note-title">${note.title}</div>
+        <div class="note-content">${note.content}</div>
+        <div class="note-date">Last updated: ${formattedDate}</div>
+        <div class="note-actions">
+            <div class="note-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></div>
+            <div class="note-btn delete" title="Delete"><i class="fas fa-trash"></i></div>
+        </div>
+    `;
+    
+    // Event listeners
+    noteCard.querySelector('.note-btn.edit').addEventListener('click', function(e) {
+        e.stopPropagation();
+        editNote(note.id);
+    });
+    
+    noteCard.querySelector('.note-btn.delete').addEventListener('click', function(e) {
+        e.stopPropagation();
+        deleteNote(note.id);
+    });
+    
+    noteCard.addEventListener('click', function() {
+        editNote(note.id);
+    });
+    
+    return noteCard;
+}
+// Render tasks
+function renderTasks() {
+    const container = document.getElementById('tasksContainer');
+    container.innerHTML = '';
+    
+    if (tasks.length === 0) {
+        const emptyTask = document.createElement('div');
+        emptyTask.className = 'add-task-btn';
+        emptyTask.innerHTML = `
+            <i class="fas fa-tasks"></i>
+            <span>Add your first task</span>
+        `;
+        emptyTask.addEventListener('click', showTaskModal);
+        container.appendChild(emptyTask);
+        return;
+    }
+    
+    // Sort tasks by completion status and due date
+    const sortedTasks = [...tasks].sort((a, b) => {
+        // Completed tasks go to the bottom
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        
+        // Sort by due date if both have one
+        if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
+        
+        // Tasks with due dates come first
+        if (a.dueDate && !b.dueDate) return -1;
+        if (!a.dueDate && b.dueDate) return 1;
+        
+        // Sort by creation date
+        return new Date(b.date) - new Date(a.date);
+    });
+    
+    sortedTasks.forEach(task => {
+        const taskItem = createTaskItem(task);
+        container.appendChild(taskItem);
+    });
+    
+    // Add "Add task" button at the bottom
+    const addTaskBtn = document.createElement('div');
+    addTaskBtn.className = 'add-task-btn';
+    addTaskBtn.innerHTML = `
+        <i class="fas fa-plus"></i>
+        <span>Add new task</span>
+    `;
+    addTaskBtn.addEventListener('click', showTaskModal);
+    container.appendChild(addTaskBtn);
+}
+
+// Create task item
+function createTaskItem(task) {
+    const taskItem = document.createElement('div');
+    taskItem.className = 'task-item';
+    if (task.completed) taskItem.classList.add('completed');
+    
+    // Format due date
+    let dueDateText = '';
+    if (task.dueDate) {
+        const dueDate = new Date(task.dueDate);
+        dueDateText = dueDate.toLocaleDateString();
+        
+        // Check if overdue
+        if (!task.completed && new Date() > dueDate) {
+            taskItem.style.borderLeftColor = 'var(--danger)';
+        }
+    }
+    
+    taskItem.innerHTML = `
+        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+        <div class="task-content">
+            <div class="task-text">${task.text}</div>
+            <div class="task-meta">
+                ${task.dueDate ? `<div class="task-date"><i class="far fa-calendar"></i> ${dueDateText}</div>` : ''}
+                <div class="task-priority">
+                    <span class="priority-badge priority-${task.priority}"></span>
+                    ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                </div>
+            </div>
+        </div>
+        <div class="task-actions">
+            <div class="task-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></div>
+            <div class="task-btn delete" title="Delete"><i class="fas fa-trash"></i></div>
+        </div>
+    `;
+    
+    // Event listeners
+    taskItem.querySelector('.task-checkbox').addEventListener('change', function() {
+        toggleTaskCompletion(task.id);
+    });
+    
+    taskItem.querySelector('.task-btn.edit').addEventListener('click', function(e) {
+        e.stopPropagation();
+        editTask(task.id);
+    });
+    
+    taskItem.querySelector('.task-btn.delete').addEventListener('click', function(e) {
+        e.stopPropagation();
+        deleteTask(task.id);
+    });
+    
+    return taskItem;
+}
+
+// Toggle task completion
+function toggleTaskCompletion(taskId) {
+    const index = tasks.findIndex(task => task.id === taskId);
+    if (index !== -1) {
+        tasks[index].completed = !tasks[index].completed;
+        saveTasks();
+        renderTasks();
+    }
+}
+
+// Render servers
+function renderServers() {
+    const tableBody = document.getElementById('serversTableBody');
+    tableBody.innerHTML = '';
+    
+    if (servers.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 30px;">
+                    <div style="opacity: 0.5; margin-bottom: 10px;"><i class="fas fa-server fa-2x"></i></div>
+                    <div>No servers added yet</div>
+                    <div><button class="btn btn-primary" style="margin-top: 15px;" onclick="showServerModal()">Add Server</button></div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    servers.forEach(server => {
+        const row = createServerRow(server);
+        tableBody.appendChild(row);
+    });
+}
+
+// Create server row
+function createServerRow(server) {
+    const row = document.createElement('tr');
+    
+    row.innerHTML = `
+        <td>${server.name}</td>
+        <td>${server.ip}</td>
+        <td><span class="server-type type-${server.type}">${getServerTypeLabel(server.type)}</span></td>
+        <td><span class="server-status status-${server.status}"></span> ${getServerStatusLabel(server.status)}</td>
+        <td>
+            <div class="server-actions">
+                <div class="server-btn connect" title="Connect"><i class="fas fa-link"></i></div>
+                <div class="server-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></div>
+                <div class="server-btn delete" title="Delete"><i class="fas fa-trash"></i></div>
+            </div>
+        </td>
+    `;
+    
+    // Event listeners
+    row.querySelector('.server-btn.connect').addEventListener('click', function() {
+        connectToServer(server);
+    });
+    
+    row.querySelector('.server-btn.edit').addEventListener('click', function() {
+        editServer(server.id);
+    });
+    
+    row.querySelector('.server-btn.delete').addEventListener('click', function() {
+        deleteServer(server.id);
+    });
+    
+    return row;
+}
+
+// Get server type label
+function getServerTypeLabel(type) {
+    const types = {
+        'web': 'Web Server',
+        'db': 'Database',
+        'file': 'File Server',
+        'auth': 'Auth Server'
+    };
+    return types[type] || type;
+}
+
+// Get server status label
+function getServerStatusLabel(status) {
+    const statuses = {
+        'online': 'Online',
+        'offline': 'Offline',
+        'maintenance': 'Maintenance'
+    };
+    return statuses[status] || status;
+}
+
+// Connect to server
+function connectToServer(server) {
+    // In a real app, this would launch a connection
+    // For now, we'll just open an SSH URL
+    window.open(`ssh://${server.ip}`, '_blank');
+    showToast(`Connecting to ${server.name} (${server.ip})...`);
+}
+// Render contacts
+function renderContacts() {
+    const container = document.getElementById('contactsContainer');
+    container.innerHTML = '';
+    
+    if (contacts.length === 0) {
+        const emptyContact = document.createElement('div');
+        emptyContact.className = 'add-contact-btn';
+        emptyContact.innerHTML = `
+            <i class="fas fa-user-plus"></i>
+            <span>Add your first contact</span>
+        `;
+        emptyContact.addEventListener('click', showContactModal);
+        container.appendChild(emptyContact);
+        return;
+    }
+    
+    contacts.forEach(contact => {
+        const contactCard = createContactCard(contact);
+        container.appendChild(contactCard);
+    });
+    
+    // Add "Add contact" button
+    const addContactBtn = document.createElement('div');
+    addContactBtn.className = 'add-contact-btn';
+    addContactBtn.innerHTML = `
+        <i class="fas fa-plus"></i>
+        <span>Add new contact</span>
+    `;
+    addContactBtn.addEventListener('click', showContactModal);
+    container.appendChild(addContactBtn);
+}
+
+// Create contact card (continued)
+function createContactCard(contact) {
+    const contactCard = document.createElement('div');
+    contactCard.className = 'contact-card';
+    
+    const initials = contact.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    
+    contactCard.innerHTML = `
+        <div class="contact-header">
+            <div class="contact-avatar">${initials}</div>
+            <div class="contact-info">
+                <div class="contact-name">${contact.name}</div>
+                <div class="contact-title">${contact.title || ''}</div>
+            </div>
+        </div>
+        <div class="contact-details">
+            ${contact.email ? `<div class="contact-item"><i class="fas fa-envelope"></i>${contact.email}</div>` : ''}
+            ${contact.phone ? `<div class="contact-item"><i class="fas fa-phone"></i>${contact.phone}</div>` : ''}
+            ${contact.company ? `<div class="contact-item"><i class="fas fa-building"></i>${contact.company}</div>` : ''}
+        </div>
+        <div class="contact-actions">
+            <div class="contact-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></div>
+            <div class="contact-btn delete" title="Delete"><i class="fas fa-trash"></i></div>
+        </div>
+    `;
+    
+    // Event listeners
+    contactCard.querySelector('.contact-btn.edit').addEventListener('click', function(e) {
+        e.stopPropagation();
+        editContact(contact.id);
+    });
+    
+    contactCard.querySelector('.contact-btn.delete').addEventListener('click', function(e) {
+        e.stopPropagation();
+        deleteContact(contact.id);
+    });
+    
+    return contactCard;
+}
+
+// Render custom sections
+function renderCustomSections() {
+    const sectionsContainer = document.getElementById('customSections');
+    sectionsContainer.innerHTML = '';
+    
+    customSections.forEach((section, index) => {
+        const sectionDiv = createCustomSection(section, index);
+        sectionsContainer.appendChild(sectionDiv);
+    });
+}
+
+// Create custom section
+function createCustomSection(section, index) {
+    const sectionDiv = document.createElement('div');
+    sectionDiv.className = 'dashboard-section';
+    sectionDiv.id = `section-${index}`;
+    
+    sectionDiv.innerHTML = `
+        <div class="section-header">
+            <div class="section-title">${section.name}</div>
+            <div class="section-actions">
+                <button class="section-btn" id="addAppToSection-${index}">Add App</button>
+                <button class="section-btn" id="addFolderToSection-${index}">Add Folder</button>
+                <button class="section-btn editSectionBtn" data-section="${index}">Edit</button>
+                <button class="section-btn deleteSectionBtn" data-section="${index}">Delete</button>
+            </div>
+        </div>
+        <div class="app-grid" id="sectionGrid-${index}"></div>
+    `;
+    // In your createCustomSection function, add the toggle button:
+const sectionHeader = document.createElement('div');
+sectionHeader.className = 'section-header';
+
+const sectionTitle = document.createElement('div');
+sectionTitle.className = 'section-title';
+sectionTitle.textContent = section.name;
+
+const toggleBtn = document.createElement('button');
+toggleBtn.className = 'section-toggle-btn';
+toggleBtn.title = 'Toggle section visibility';
+toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    // Add event listeners
+    sectionDiv.querySelector(`#addAppToSection-${index}`).addEventListener('click', function() {
+        showAppModal('url', index);
+    });
+    
+    sectionDiv.querySelector(`#addFolderToSection-${index}`).addEventListener('click', function() {
+        showAppModal('folder', index);
+    });
+    
+    sectionDiv.querySelector('.editSectionBtn').addEventListener('click', function() {
+        editSection(index);
+    });
+    
+    sectionDiv.querySelector('.deleteSectionBtn').addEventListener('click', function() {
+        deleteSection(index);
+    });
+    
+    // Render apps in this section
+    const sectionApps = apps.filter(app => app.section === index);
+    const grid = sectionDiv.querySelector(`#sectionGrid-${index}`);
+    
+    if (sectionApps.length === 0) {
+        const emptyText = document.createElement('div');
+        emptyText.style.padding = '20px';
+        emptyText.style.color = 'rgba(255, 255, 255, 0.5)';
+        emptyText.style.textAlign = 'center';
+        emptyText.textContent = 'No applications added to this section yet';
+        grid.appendChild(emptyText);
+    } else {
+        sectionApps.forEach(app => {
+            const appCard = createAppCard(app);
+            grid.appendChild(appCard);
+        });
+    }
+    
+    return sectionDiv;
+}
+
+// Modal functions
+function showAppModal(type = 'url', section = null) {
+    const modal = document.getElementById('appModal');
+    const modalTitle = document.getElementById('appModalTitle');
+    const urlGroup = document.getElementById('appUrlGroup');
+    const folderGroup = document.getElementById('appFolderGroup');
+    const saveBtn = document.getElementById('saveAppBtn');
+    const typeInput = document.getElementById('appType');
+    
+    // Reset form
+    document.getElementById('appForm').reset();
+    document.getElementById('editAppIndex').value = '-1';
+    
+    // Set type
+    typeInput.value = type;
+    if (type === 'url') {
+        urlGroup.style.display = 'block';
+        folderGroup.style.display = 'none';
+        modalTitle.textContent = 'Add New Application';
+    } else {
+        urlGroup.style.display = 'none';
+        folderGroup.style.display = 'block';
+        modalTitle.textContent = 'Add New Folder';
+    }
+    
+    // Store section if specified
+    if (section !== null) {
+        document.getElementById('editAppSection').value = section;
+    } else {
+        document.getElementById('editAppSection').value = '';
+    }
+    
+    // Reset icon selector
+    renderIconSelector();
+    
+    // Show modal
+    modal.style.display = 'flex';
+}
+
+// Render icon selector
+function renderIconSelector() {
+    const selector = document.getElementById('iconSelector');
+    selector.innerHTML = '';
+    
+    availableIcons.forEach(icon => {
+        const iconOption = document.createElement('div');
+        iconOption.className = 'icon-option';
+        iconOption.textContent = icon;
+        iconOption.dataset.icon = icon;
+        
+        iconOption.addEventListener('click', function() {
+            // Remove 'selected' class from all options
+            document.querySelectorAll('.icon-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add 'selected' class to the clicked option
+            this.classList.add('selected');
+        });
+        
+        selector.appendChild(iconOption);
+    });
+    
+    // Select first icon by default
+    if (selector.firstChild) {
+        selector.firstChild.classList.add('selected');
+    }
+}
+
+// Show/hide modals
+function showNoteModal(noteId = null) {
+    const modal = document.getElementById('noteModal');
+    modal.style.display = 'flex';
+    
+    // Reset form
+    document.getElementById('noteForm').reset();
+    document.getElementById('editNoteIndex').value = '-1';
+    
+    if (noteId) {
+        // Fill form with note data for editing
+        const note = notes.find(n => n.id === noteId);
+        if (note) {
+            document.getElementById('editNoteIndex').value = noteId;
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            document.getElementById('noteModalTitle').textContent = 'Edit Note';
+            document.getElementById('saveNoteBtn').textContent = 'Save Changes';
+        }
+    } else {
+        document.getElementById('noteModalTitle').textContent = 'Add New Note';
+        document.getElementById('saveNoteBtn').textContent = 'Save Note';
+    }
+}
+
+function showTaskModal(taskId = null) {
+    const modal = document.getElementById('taskModal');
+    modal.style.display = 'flex';
+    
+    // Reset form
+    document.getElementById('taskForm').reset();
+    document.getElementById('editTaskIndex').value = '-1';
+    
+    // Reset priority selection
+    document.querySelectorAll('#taskPrioritySelector .pill-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    document.querySelector('#taskPrioritySelector .pill-option[data-value="medium"]').classList.add('selected');
+    
+    if (taskId) {
+        // Fill form with task data for editing
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+            document.getElementById('editTaskIndex').value = taskId;
+            document.getElementById('taskText').value = task.text;
+            document.getElementById('taskDueDate').value = task.dueDate || '';
+            document.getElementById('taskNotes').value = task.notes || '';
+            
+            // Set priority
+            document.querySelectorAll('#taskPrioritySelector .pill-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`#taskPrioritySelector .pill-option[data-value="${task.priority}"]`).classList.add('selected');
+            
+            document.getElementById('taskModalTitle').textContent = 'Edit Task';
+            document.getElementById('saveTaskBtn').textContent = 'Save Changes';
+        }
+    } else {
+        document.getElementById('taskModalTitle').textContent = 'Add New Task';
+        document.getElementById('saveTaskBtn').textContent = 'Save Task';
+    }
+}
+
+function showServerModal(serverId = null) {
+    const modal = document.getElementById('serverModal');
+    modal.style.display = 'flex';
+    
+    // Reset form
+    document.getElementById('serverForm').reset();
+    document.getElementById('editServerIndex').value = '-1';
+    
+    // Reset selections
+    document.querySelectorAll('#serverTypeSelector .pill-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    document.querySelector('#serverTypeSelector .pill-option[data-value="web"]').classList.add('selected');
+    
+    document.querySelectorAll('#serverStatusSelector .pill-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    document.querySelector('#serverStatusSelector .pill-option[data-value="online"]').classList.add('selected');
+    
+    if (serverId) {
+        // Fill form with server data for editing
+        const server = servers.find(s => s.id === serverId);
+        if (server) {
+            document.getElementById('editServerIndex').value = serverId;
+            document.getElementById('serverName').value = server.name;
+            document.getElementById('serverIP').value = server.ip;
+            document.getElementById('serverNotes').value = server.notes || '';
+            
+            // Set type and status
+            document.querySelectorAll('#serverTypeSelector .pill-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`#serverTypeSelector .pill-option[data-value="${server.type}"]`).classList.add('selected');
+            
+            document.querySelectorAll('#serverStatusSelector .pill-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`#serverStatusSelector .pill-option[data-value="${server.status}"]`).classList.add('selected');
+            
+            document.getElementById('serverModalTitle').textContent = 'Edit Server';
+            document.getElementById('saveServerBtn').textContent = 'Save Changes';
+        }
+    } else {
+        document.getElementById('serverModalTitle').textContent = 'Add New Server';
+        document.getElementById('saveServerBtn').textContent = 'Save Server';
+    }
+}
+
+function showContactModal(contactId = null) {
+    const modal = document.getElementById('contactModal');
+    modal.style.display = 'flex';
+    
+    // Reset form
+    document.getElementById('contactForm').reset();
+    document.getElementById('editContactIndex').value = '-1';
+    
+    if (contactId) {
+        // Fill form with contact data for editing
+        const contact = contacts.find(c => c.id === contactId);
+        if (contact) {
+            document.getElementById('editContactIndex').value = contactId;
+            document.getElementById('contactName').value = contact.name;
+            document.getElementById('contactTitle').value = contact.title || '';
+            document.getElementById('contactEmail').value = contact.email || '';
+            document.getElementById('contactPhone').value = contact.phone || '';
+            document.getElementById('contactCompany').value = contact.company || '';
+            document.getElementById('contactNotes').value = contact.notes || '';
+            
+            document.getElementById('contactModalTitle').textContent = 'Edit Contact';
+            document.getElementById('saveContactBtn').textContent = 'Save Changes';
+        }
+    } else {
+        document.getElementById('contactModalTitle').textContent = 'Add New Contact';
+        document.getElementById('saveContactBtn').textContent = 'Save Contact';
+    }
+}
+
+function showSectionModal(sectionIndex = null) {
+    const modal = document.getElementById('sectionModal');
+    modal.style.display = 'flex';
+    
+    // Reset form
+    document.getElementById('sectionForm').reset();
+    document.getElementById('editSectionIndex').value = '-1';
+    
+    if (sectionIndex !== null) {
+        // Fill form with section data for editing
+        const section = customSections[sectionIndex];
+        if (section) {
+            document.getElementById('editSectionIndex').value = sectionIndex;
+            document.getElementById('sectionName').value = section.name;
+            
+            document.getElementById('sectionModalTitle').textContent = 'Edit Section';
+            document.getElementById('saveSectionBtn').textContent = 'Save Changes';
+        }
+    } else {
+        document.getElementById('sectionModalTitle').textContent = 'Add New Section';
+        document.getElementById('saveSectionBtn').textContent = 'Add Section';
+    }
+}
+
+// Hide modals
+function hideAppModal() {
+    document.getElementById('appModal').style.display = 'none';
+}
+
+function hideNoteModal() {
+    document.getElementById('noteModal').style.display = 'none';
+}
+
+function hideTaskModal() {
+    document.getElementById('taskModal').style.display = 'none';
+}
+
+function hideServerModal() {
+    document.getElementById('serverModal').style.display = 'none';
+}
+
+function hideContactModal() {
+    document.getElementById('contactModal').style.display = 'none';
+}
+
+function hideSectionModal() {
+    document.getElementById('sectionModal').style.display = 'none';
+}
+
+// Save functions
+function saveApp(e) {
+    e.preventDefault();
+    
+    const editIdInput = document.getElementById('editAppIndex');
+    const nameInput = document.getElementById('appName');
+    const typeInput = document.getElementById('appType');
+    const sectionInput = document.getElementById('editAppSection');
+    const selectedIcon = document.querySelector('.icon-option.selected');
+    
+    const name = nameInput.value.trim();
+    const type = typeInput.value;
+    const section = sectionInput.value !== '' ? parseInt(sectionInput.value) : null;
+    
+    // Validation
+    if (!name) {
+        showToast('Please enter a name', 'error');
+        return;
+    }
+    
+    if (!selectedIcon) {
+        showToast('Please select an icon', 'error');
+        return;
+    }
+    
+    const icon = selectedIcon.dataset.icon;
+    
+    // Get URL or folder path based on type
+    let urlOrPath = '';
+    if (type === 'url') {
+        urlOrPath = document.getElementById('appUrl').value.trim();
+        if (!urlOrPath) {
+            showToast('Please enter a URL', 'error');
+            return;
+        }
+        
+        // Add https:// if missing
+        if (!urlOrPath.startsWith('http://') && !urlOrPath.startsWith('https://')) {
+            urlOrPath = 'https://' + urlOrPath;
+        }
+    } else {
+        urlOrPath = document.getElementById('appFolder').value.trim();
+        if (!urlOrPath) {
+            showToast('Please enter a folder path', 'error');
+            return;
+        }
+    }
+    
+    const editId = editIdInput.value;
+    
+    if (editId !== '-1') {
+        // Update existing app
+        const index = apps.findIndex(app => app.id === editId);
+        if (index !== -1) {
+            if (type === 'url') {
+                apps[index] = {
+                    ...apps[index],
+                    name,
+                    icon,
+                    url: urlOrPath,
+                    section
+                };
+            } else {
+                apps[index] = {
+                    ...apps[index],
+                    name,
+                    icon,
+                    path: urlOrPath,
+                    section
+                };
+            }
+            showToast(`Updated "${name}"`);
+        }
+    } else {
+        // Add new app
+        const newApp = {
+            id: generateId(),
+            name,
+            icon,
+            type,
+            section
+        };
+        
+        if (type === 'url') {
+            newApp.url = urlOrPath;
+        } else {
+            newApp.path = urlOrPath;
+        }
+        
+        apps.push(newApp);
+        showToast(`Added "${name}"`);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('dashboard_apps', JSON.stringify(apps));
+    
+    // Update UI
+    renderApps();
+    renderCustomSections();
+    hideAppModal();
+}
+
+function saveNote(e) {
+    e.preventDefault();
+    
+    const editIdInput = document.getElementById('editNoteIndex');
+    const titleInput = document.getElementById('noteTitle');
+    const contentInput = document.getElementById('noteContent');
+    
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+    
+    // Validation
+    if (!title) {
+        showToast('Please enter a title', 'error');
+        return;
+    }
+    
+    if (!content) {
+        showToast('Please enter some content', 'error');
+        return;
+    }
+    
+    const editId = editIdInput.value;
+    
+    if (editId !== '-1') {
+        // Update existing note
+        const index = notes.findIndex(note => note.id === editId);
+        if (index !== -1) {
+            notes[index] = {
+                ...notes[index],
+                title,
+                content,
+                date: new Date()
+            };
+            showToast('Note updated');
+        }
+    } else {
+        // Add new note
+        const newNote = {
+            id: generateId(),
+            title,
+            content,
+            date: new Date()
+        };
+        
+        notes.push(newNote);
+        showToast('Note added');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('dashboard_notes', JSON.stringify(notes));
+    
+    // Update UI
+    renderNotes();
+    hideNoteModal();
+}
+
+function saveTask(e) {
+    e.preventDefault();
+    
+    const editIdInput = document.getElementById('editTaskIndex');
+    const textInput = document.getElementById('taskText');
+    const dueDateInput = document.getElementById('taskDueDate');
+    const notesInput = document.getElementById('taskNotes');
+    const selectedPriority = document.querySelector('#taskPrioritySelector .pill-option.selected');
+    
+    const text = textInput.value.trim();
+    const dueDate = dueDateInput.value;
+    const notes = notesInput.value.trim();
+    
+    // Validation
+    if (!text) {
+        showToast('Please enter a task', 'error');
+        return;
+    }
+    
+    const priority = selectedPriority ? selectedPriority.dataset.value : 'medium';
+    
+    const editId = editIdInput.value;
+    
+    if (editId !== '-1') {
+        // Update existing task
+        const index = tasks.findIndex(task => task.id === editId);
+        if (index !== -1) {
+            tasks[index] = {
+                ...tasks[index],
+                text,
+                dueDate: dueDate || null,
+                priority,
+                notes: notes || null,
+                date: new Date()
+            };
+            showToast('Task updated');
+        }
+    } else {
+        // Add new task
+        const newTask = {
+            id: generateId(),
+            text,
+            dueDate: dueDate || null,
+            priority,
+            notes: notes || null,
+            completed: false,
+            date: new Date()
+        };
+        
+        tasks.push(newTask);
+        showToast('Task added');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('dashboard_tasks', JSON.stringify(tasks));
+    
+    // Update UI
+    renderTasks();
+    hideTaskModal();
+}
+
+function saveServer(e) {
+    e.preventDefault();
+    
+    const editIdInput = document.getElementById('editServerIndex');
+    const nameInput = document.getElementById('serverName');
+    const ipInput = document.getElementById('serverIP');
+    const notesInput = document.getElementById('serverNotes');
+    const selectedType = document.querySelector('#serverTypeSelector .pill-option.selected');
+    const selectedStatus = document.querySelector('#serverStatusSelector .pill-option.selected');
+    
+    const name = nameInput.value.trim();
+    const ip = ipInput.value.trim();
+    const notes = notesInput.value.trim();
+    
+    // Validation
+    if (!name) {
+        showToast('Please enter a server name', 'error');
+        return;
+    }
+    
+    if (!ip) {
+        showToast('Please enter an IP address', 'error');
+        return;
+    }
+    
+    const type = selectedType ? selectedType.dataset.value : 'web';
+    const status = selectedStatus ? selectedStatus.dataset.value : 'online';
+    
+    const editId = editIdInput.value;
+    
+    if (editId !== '-1') {
+        // Update existing server
+        const index = servers.findIndex(server => server.id === editId);
+        if (index !== -1) {
+            servers[index] = {
+                ...servers[index],
+                name,
+                ip,
+                type,
+                status,
+                notes: notes || null
+            };
+            showToast('Server updated');
+        }
+    } else {
+        // Add new server
+        const newServer = {
+            id: generateId(),
+            name,
+            ip,
+            type,
+            status,
+            notes: notes || null
+        };
+        
+        servers.push(newServer);
+        showToast('Server added');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('dashboard_servers', JSON.stringify(servers));
+    
+    // Update UI
+    renderServers();
+    hideServerModal();
+}
+
+function saveContact(e) {
+    e.preventDefault();
+    
+    const editIdInput = document.getElementById('editContactIndex');
+    const nameInput = document.getElementById('contactName');
+    const titleInput = document.getElementById('contactTitle');
+    const emailInput = document.getElementById('contactEmail');
+    const phoneInput = document.getElementById('contactPhone');
+    const companyInput = document.getElementById('contactCompany');
+    const notesInput = document.getElementById('contactNotes');
+    
+    const name = nameInput.value.trim();
+    const title = titleInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const company = companyInput.value.trim();
+    const notes = notesInput.value.trim();
+    
+    // Validation
+    if (!name) {
+        showToast('Please enter a contact name', 'error');
+        return;
+    }
+    
+    const editId = editIdInput.value;
+    
+    if (editId !== '-1') {
+        // Update existing contact
+        const index = contacts.findIndex(contact => contact.id === editId);
+        if (index !== -1) {
+            contacts[index] = {
+                ...contacts[index],
+                name,
+                title: title || null,
+                email: email || null,
+                phone: phone || null,
+                company: company || null,
+                notes: notes || null
+            };
+            showToast('Contact updated');
+        }
+    } else {
+        // Add new contact
+        const newContact = {
+            id: generateId(),
+            name,
+            title: title || null,
+            email: email || null,
+            phone: phone || null,
+            company: company || null,
+            notes: notes || null
+        };
+        
+        contacts.push(newContact);
+        showToast('Contact added');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('dashboard_contacts', JSON.stringify(contacts));
+    
+    // Update UI
+    renderContacts();
+    hideContactModal();
+}
+
+function saveSection(e) {
+    e.preventDefault();
+    
+    const editIndexInput = document.getElementById('editSectionIndex');
+    const nameInput = document.getElementById('sectionName');
+    
+    const name = nameInput.value.trim();
+    
+    // Validation
+    if (!name) {
+        showToast('Please enter a section name', 'error');
+        return;
+    }
+    
+    const editIndex = parseInt(editIndexInput.value);
+    
+    if (editIndex !== -1) {
+        // Update existing section
+        customSections[editIndex].name = name;
+        showToast('Section updated');
+    } else {
+        // Add new section
+        customSections.push({
+            name
+        });
+        showToast('Section added');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('dashboard_sections', JSON.stringify(customSections));
+    
+    // Update UI
+    renderCustomSections();
+    hideSectionModal();
+}
+
+// Delete functions
+function deleteApp(appId) {
+    if (confirm('Are you sure you want to delete this application?')) {
+        const index = apps.findIndex(app => app.id === appId);
+        if (index !== -1) {
+            const appName = apps[index].name;
+            apps.splice(index, 1);
+            localStorage.setItem('dashboard_apps', JSON.stringify(apps));
+            renderApps();
+            renderCustomSections();
+            showToast(`Deleted "${appName}"`);
+        }
+    }
+}
+
+function deleteNote(noteId) {
+    if (confirm('Are you sure you want to delete this note?')) {
+        const index = notes.findIndex(note => note.id === noteId);
+        if (index !== -1) {
+            notes.splice(index, 1);
+            localStorage.setItem('dashboard_notes', JSON.stringify(notes));
+            renderNotes();
+            showToast('Note deleted');
+        }
+    }
+}
+
+function deleteTask(taskId) {
+    if (confirm('Are you sure you want to delete this task?')) {
+        const index = tasks.findIndex(task => task.id === taskId);
+        if (index !== -1) {
+            tasks.splice(index, 1);
+            localStorage.setItem('dashboard_tasks', JSON.stringify(tasks));
+            renderTasks();
+            showToast('Task deleted');
+        }
+    }
+}
+
+function deleteServer(serverId) {
+    if (confirm('Are you sure you want to delete this server?')) {
+        const index = servers.findIndex(server => server.id === serverId);
+        if (index !== -1) {
+            const serverName = servers[index].name;
+            servers.splice(index, 1);
+            localStorage.setItem('dashboard_servers', JSON.stringify(servers));
+            renderServers();
+            showToast(`Deleted server "${serverName}"`);
+        }
+    }
+}
+
+function deleteContact(contactId) {
+    if (confirm('Are you sure you want to delete this contact?')) {
+        const index = contacts.findIndex(contact => contact.id === contactId);
+        if (index !== -1) {
+            const contactName = contacts[index].name;
+            contacts.splice(index, 1);
+            localStorage.setItem('dashboard_contacts', JSON.stringify(contacts));
+            renderContacts();
+            showToast(`Deleted contact "${contactName}"`);
+        }
+    }
+}
+
+function deleteSection(sectionIndex) {
+    if (confirm('Are you sure you want to delete this section? All apps in this section will be moved to the main section.')) {
+        // Move apps from this section to main section
+        apps.forEach(app => {
+            if (app.section === sectionIndex) {
+                app.section = null;
+            } else if (app.section > sectionIndex) {
+                app.section = app.section - 1;
+            }
+        });
+        
+        // Remove the section
+        customSections.splice(sectionIndex, 1);
+        
+        // Save changes
+        localStorage.setItem('dashboard_apps', JSON.stringify(apps));
+        localStorage.setItem('dashboard_sections', JSON.stringify(customSections));
+        
+        // Update UI
+        renderApps();
+        renderCustomSections();
+        showToast('Section deleted');
+    }
+}
+
+// Edit functions
+function editApp(appId) {
+    const app = apps.find(a => a.id === appId);
+    if (app) {
+        showAppModal(app.type, app.section);
+        
+        // Populate form
+        document.getElementById('editAppIndex').value = app.id;
+        document.getElementById('appName').value = app.name;
+        
+        if (app.type === 'url') {
+            document.getElementById('appUrl').value = app.url;
+        } else {
+            document.getElementById('appFolder').value = app.path;
+        }
+        
+        // Select the icon
+        setTimeout(() => {
+            const iconElement = document.querySelector(`.icon-option[data-icon="${app.icon}"]`);
+            if (iconElement) {
+                document.querySelectorAll('.icon-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                iconElement.classList.add('selected');
+            }
+        }, 100);
+        
+        // Update modal title
+        document.getElementById('appModalTitle').textContent = app.type === 'url' ? 'Edit Application' : 'Edit Folder';
+        document.getElementById('saveAppBtn').textContent = 'Save Changes';
+    }
+}
+
+function editNote(noteId) {
+    const note = notes.find(n => n.id === noteId);
+    if (note) {
+        showNoteModal(noteId);
+    }
+}
+
+function editTask(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        showTaskModal(taskId);
+    }
+}
+
+function editServer(serverId) {
+    const server = servers.find(s => s.id === serverId);
+    if (server) {
+        showServerModal(serverId);
+    }
+}
+
+function editContact(contactId) {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+        showContactModal(contactId);
+    }
+}
+
+function editSection(sectionIndex) {
+    showSectionModal(sectionIndex);
+}
+
+// Utility functions
+function openLocalFolder(path) {
+    // Convert backslashes to forward slashes for file:// URL
+    const folderUrl = 'file:///' + path.replace(/\\/g, '/');
+    window.open(folderUrl, '_blank');
+    showToast(`Opening folder...`);
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastContent = document.getElementById('toastContent');
+    
+    toast.className = 'toast';
+    if (type === 'error') toast.classList.add('error');
+    
+    toastContent.textContent = message;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Search functionality (continued)
+function handleSearch(searchTerm) {
+    if (!searchTerm) {
+        // If search is empty, show all
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+            section.style.display = 'block';
+        });
+        renderAllSections();
+        return;
+    }
+    
+    // Search apps
+    const appCards = document.querySelectorAll('#appsGrid .app-card');
+    appCards.forEach(card => {
+        const appName = card.querySelector('.app-name').textContent.toLowerCase();
+        if (appName.includes(searchTerm)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Search notes
+    let foundNotes = false;
+    const noteCards = document.querySelectorAll('.note-card');
+    noteCards.forEach(card => {
+        const noteTitle = card.querySelector('.note-title').textContent.toLowerCase();
+        const noteContent = card.querySelector('.note-content').textContent.toLowerCase();
+        if (noteTitle.includes(searchTerm) || noteContent.includes(searchTerm)) {
+            card.style.display = 'block';
+            foundNotes = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    document.getElementById('notesSection').style.display = foundNotes ? 'block' : 'none';
+    
+    // Search tasks
+    let foundTasks = false;
+    const taskItems = document.querySelectorAll('.task-item');
+    taskItems.forEach(item => {
+        const taskText = item.querySelector('.task-text').textContent.toLowerCase();
+        if (taskText.includes(searchTerm)) {
+            item.style.display = 'flex';
+            foundTasks = true;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    document.getElementById('tasksSection').style.display = foundTasks ? 'block' : 'none';
+    
+    // Search servers
+    let foundServers = false;
+    const serverRows = document.querySelectorAll('#serversTableBody tr');
+    serverRows.forEach(row => {
+        const serverName = row.querySelector('td:first-child').textContent.toLowerCase();
+        const serverIP = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        if (serverName.includes(searchTerm) || serverIP.includes(searchTerm)) {
+            row.style.display = 'table-row';
+            foundServers = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    document.getElementById('serversSection').style.display = foundServers ? 'block' : 'none';
+    
+    // Search contacts
+    let foundContacts = false;
+    const contactCards = document.querySelectorAll('.contact-card');
+    contactCards.forEach(card => {
+        const contactName = card.querySelector('.contact-name').textContent.toLowerCase();
+        const contactTitle = card.querySelector('.contact-title')?.textContent.toLowerCase() || '';
+        const contactDetails = card.querySelector('.contact-details').textContent.toLowerCase();
+        if (contactName.includes(searchTerm) || contactTitle.includes(searchTerm) || contactDetails.includes(searchTerm)) {
+            card.style.display = 'block';
+            foundContacts = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    document.getElementById('contactsSection').style.display = foundContacts ? 'block' : 'none';
+    
+    // Search custom sections
+    customSections.forEach((section, index) => {
+        const sectionElement = document.getElementById(`section-${index}`);
+        if (sectionElement) {
+            const sectionTitle = section.name.toLowerCase();
+            const sectionApps = sectionElement.querySelectorAll('.app-card');
+            
+            let foundInSection = sectionTitle.includes(searchTerm);
+            
+            if (!foundInSection) {
+                let foundInApps = false;
+                sectionApps.forEach(card => {
+                    const appName = card.querySelector('.app-name').textContent.toLowerCase();
+                    if (appName.includes(searchTerm)) {
+                        card.style.display = 'flex';
+                        foundInApps = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                foundInSection = foundInApps;
+            }
+            
+            sectionElement.style.display = foundInSection ? 'block' : 'none';
+        }
+    });
+    
+    // Hide "Add Section" button during search
+    document.getElementById('addSectionBtn').style.display = 'none';
+}
+</script>
